@@ -15,8 +15,8 @@ public class InteractiveObjectPanel : MonoBehaviour
 
     private string currentObjectName;
     private Transform currentObjectTransform;
-    private Vector3 currentObjectSize;
-    private float panelOffsetMultiplier = 1f;
+    private float currentObjectHeight;
+    private float panelOffsetMultiplier = 3f;
 
     public bool IsEnable => gameObject.transform.localScale == Vector3.one;
 
@@ -51,7 +51,7 @@ public class InteractiveObjectPanel : MonoBehaviour
         if (!isContainerLooted)
         {
             interactiveObjectInfo.SetVisibility(true);
-        }     
+        }    
     }
 
     public void EnablePostInteractionPlayerActionsContainer(List<DetailedActionTip> actionTips)
@@ -62,9 +62,11 @@ public class InteractiveObjectPanel : MonoBehaviour
     public void EnableUI(Transform objectTransform)
     {
         currentObjectTransform = objectTransform;
-        currentObjectSize = currentObjectTransform.gameObject.GetComponent<MeshRenderer>().bounds.size;
-        currentObjectSize.x = 0;
+        currentObjectHeight = currentObjectTransform.gameObject.GetComponent<MeshRenderer>() != null
+                                ? currentObjectTransform.gameObject.GetComponent<MeshRenderer>().bounds.size.y / 2
+                                : 0;
         gameObject.transform.localScale = Vector3.one;
+        interactiveObjectInfo.SetVisibility(true);
     }
 
     public void DisableUI()
@@ -76,7 +78,9 @@ public class InteractiveObjectPanel : MonoBehaviour
     {
         if (IsEnable)
         {
-            Vector2 objectScreenPosition = Camera.main.WorldToScreenPoint(currentObjectTransform.position + currentObjectSize * panelOffsetMultiplier);
+            Vector2 objectScreenPosition = Camera.main.WorldToScreenPoint(new Vector3(currentObjectTransform.position.x, 
+                                                                                      currentObjectTransform.position.y + currentObjectHeight * panelOffsetMultiplier,
+                                                                                      currentObjectTransform.position.z));
             gameObject.transform.position = objectScreenPosition;
         }
     }

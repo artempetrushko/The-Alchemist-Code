@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PickableItem : MonoBehaviour
 {
@@ -18,5 +19,21 @@ public class PickableItem : MonoBehaviour
                 currentItemState = value;
             }
         }   
+    }
+
+    private void OnEnable()
+    {
+        if (GetComponentInParent<PlayerInput>() != null)
+        {
+            var particleSystem = GetComponentInChildren<ParticleSystem>();
+            if (particleSystem != null)
+            {
+                particleSystem.gameObject.SetActive(false);
+            }
+            if (GetComponent<SphereCollider>() != null)
+            {
+                Destroy(GetComponent<SphereCollider>());
+            }          
+        }
     }
 }

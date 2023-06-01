@@ -35,10 +35,17 @@ public class CraftSection : PlayerMenuSection
         else
         {
             var currentSelectedInventoryCell = inventorySection.GetComponentInChildren<CraftInventorySubsection>().SelectedItemCell;
-            if (currentSelectedInventoryCell != null )
+            if (currentSelectedInventoryCell != null)
             {
                 currentSelectedInventoryCell.GetComponent<CraftInventoryItemCellView>().DisableDescriptionPanel();
             }
+
+            var existingItemDescriptionPanel = FindObjectOfType<ItemDescriptionPanel>();
+            if (existingItemDescriptionPanel != null)
+            {
+                Destroy(existingItemDescriptionPanel.gameObject);
+            }
+
             recipesSection.DeleteRecipeCategories();
             craftManager.CurrentRecipe = null;
         }

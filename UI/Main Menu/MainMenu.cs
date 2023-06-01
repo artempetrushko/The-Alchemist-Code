@@ -10,8 +10,20 @@ public class MainMenu : MonoBehaviour
     private GameObject buttons;
     [SerializeField] 
     private Button returnToMenuButton;
+    [Space]
+    [SerializeField]
+    private GameObject settingsMenuSection;
 
     private GameObject currentOpenedMenuSection = null;
+
+    public void ShowSettingsMenuSection()
+    {
+        buttons.SetActive(false);
+        settingsMenuSection.SetActive(true);
+        returnToMenuButton.gameObject.SetActive(true);
+        currentOpenedMenuSection = settingsMenuSection;
+        settingsMenuSection.GetComponentInChildren<GraphicsSettingsSection>().SendSettingsData();
+    }
 
     public void ShowMenuSection(GameObject menuSection)
     {
@@ -26,6 +38,7 @@ public class MainMenu : MonoBehaviour
         currentOpenedMenuSection.SetActive(false);
         returnToMenuButton.gameObject.SetActive(false);
         buttons.SetActive(true);
+        GetComponentInChildren<MainMenuNavigation>().StartNavigation();
     }
 
     public void StartGame() => SceneManager.LoadScene(1);

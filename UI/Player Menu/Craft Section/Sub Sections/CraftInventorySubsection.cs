@@ -23,21 +23,24 @@ public abstract class CraftInventorySubsection : CraftSectionSubsection
         get => selectedItemCell; 
         protected set
         {
-            if (selectedItemCell != null)
+            if (value != selectedItemCell)
             {
-                SelectedItemCell.ToggleBackgroundState(CellViewState.Normal);
-                SelectedItemCell.DisableDescriptionPanel();
-            }
-            selectedItemCell = value;
-            if (selectedItemCell != null)
-            {
-                SelectedItemCell.ToggleBackgroundState(CellViewState.Selected);
-                SelectedItemCell.EnableDescriptionPanel();
-            }                  
-            if (sectionNavigation.CurrentSubsection != this)
-            {
-                sectionNavigation.CurrentSubsection = this;
-            }
+                if (selectedItemCell != null)
+                {
+                    SelectedItemCell.ToggleBackgroundState(CellViewState.Normal);
+                    SelectedItemCell.DisableDescriptionPanel();
+                }
+                selectedItemCell = value;
+                if (selectedItemCell != null)
+                {
+                    SelectedItemCell.ToggleBackgroundState(CellViewState.Selected);
+                    SelectedItemCell.EnableDescriptionPanel();
+                }
+                if (sectionNavigation.CurrentSubsection != this)
+                {
+                    sectionNavigation.CurrentSubsection = this;
+                }
+            }        
         }
     }
 

@@ -25,7 +25,7 @@ public abstract class ItemState : ICloneable
         get => currentInventoryItemCellView;
         set
         {
-            if (currentInventoryItemCellView != null && currentInventoryItemCellView != value)
+            if (currentInventoryItemCellView != null /*&& currentInventoryItemCellView != value*/)
             {
                 currentInventoryItemCellView.DisableInfoElements();
             }
@@ -41,7 +41,7 @@ public abstract class ItemState : ICloneable
         get => currentMechanicsItemCellView;
         set
         {
-            if (currentMechanicsItemCellView != null && currentMechanicsItemCellView != value)
+            if (currentMechanicsItemCellView != null/* && currentMechanicsItemCellView != value*/)
             {
                 currentMechanicsItemCellView.DisableInfoElements();
             }
@@ -54,6 +54,7 @@ public abstract class ItemState : ICloneable
                     (currentMechanicsItemCellView as CraftInventorySectionCellView).LinkedMainInventoryItemCellView.GetComponent<ItemCellContainer>()
                         .PlaceItem(CurrentInventoryItemCellView.GetComponent<ItemCellContainer>().ContainedItem);
                 }
+                Debug.Log(currentMechanicsItemCellView.gameObject);
             }
         }
     }

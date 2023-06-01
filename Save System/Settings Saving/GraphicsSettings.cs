@@ -6,7 +6,8 @@ using UnityEngine;
 [Serializable]
 public class GraphicsSettings
 {
-    public Resolution ScreenResolution;
+    public int ScreenResolutionWidth;
+    public int ScreenResolutionHeight;
     public FullScreenMode ScreenMode;
     public int QualityLevel;
     public int VSyncState;

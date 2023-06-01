@@ -41,12 +41,13 @@ public class CraftSectionInventory : MonoBehaviour
         var inventoryItems = inventoryManager.Items;
         if (craftManager.CurrentCraftingItemCells != null)
         {
-            var ignoringItems = craftManager.CurrentCraftingItemCells
+            var ingredientItems = craftManager.CurrentCraftingItemCells
                 .Select(cell => cell.GetComponent<ItemCellContainer>().ContainedItem)
                 .Where(item => item != null)
                 .Select(item => item.ItemState)
                 .ToList();
-            inventoryItems = inventoryManager.Items.Where(item => !ignoringItems.Contains(item)).ToList();
+            var energyContainingItems = craftManager.EnergyContainingItems.Select(item => item.ItemState).ToList();
+            inventoryItems = inventoryManager.Items.Where(item => !ingredientItems.Contains(item) && !energyContainingItems.Contains(item)).ToList();
         }      
         foreach (var item in inventoryItems) 
         {
@@ -69,6 +70,23 @@ public class CraftSectionInventory : MonoBehaviour
             itemCell.LinkedMainInventoryItemCellView = linkedMainInventoryItemCellView;
             linkedMainInventoryItemCellView.LinkedMechanicsItemCellView = itemCell;
         }
+
+        equipmentCells.GetComponentsInChildren<ItemCellContainer>()
+            .Where(container => !container.IsItemPlaceEmpty)
+            .ToList()
+            .ForEach(container =>
+            {
+                container.ContainedItem.AttachedItemCellView = null;
+                Destroy(container.ContainedItem.gameObject);
+            });
+        quickAccessCells.GetComponentsInChildren<ItemCellContainer>()
+            .Where(container => !container.IsItemPlaceEmpty)
+            .ToList()
+            .ForEach(container =>
+            {
+                container.ContainedItem.AttachedItemCellView = null;
+                Destroy(container.ContainedItem.gameObject);
+            });
     }
 
     private void OnEnable()

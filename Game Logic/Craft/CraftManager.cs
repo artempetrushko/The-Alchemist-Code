@@ -9,6 +9,7 @@ public class CraftManager : MonoBehaviour
     private List<RecipeData> availableCraftRecipes = new List<RecipeData>();
 
     private InventoryManager inventoryManager;
+    private GameManager gameManager;
     private CraftSection craftSection;
     private RecipeData currentRecipe;
     private RecipeVariant currentRecipeVariant;
@@ -20,6 +21,7 @@ public class CraftManager : MonoBehaviour
 
     public List<RecipeData> AvailableCraftRecipes => availableCraftRecipes;
     public List<CraftingItemTemplateCellView> CurrentCraftingItemCells => currentCraftingTemplateCells;
+    public List<ItemInfo> EnergyContainingItems => craftSection.ItemCreationSection.EnergyCellsItems;
     public RecipeData CurrentRecipe
     {
         get => currentRecipe;
@@ -73,15 +75,12 @@ public class CraftManager : MonoBehaviour
         get => currentExtractedEnergyCount;
         set
         {
-            if (currentExtractedEnergyCount != value)
+            currentExtractedEnergyCount = value;
+            if (currentExtractedEnergyCount != null)
             {
-                currentExtractedEnergyCount = value;
-                if (currentExtractedEnergyCount != null)
-                {
-                    craftSection.ItemCreationSection.CraftDescriptionPanel.SetExtractedEnergyCountInfo(CurrentExtractedEnergyCount.Value, currentRecipe.RequiredEnergyCount);
-                    IsCreationAvailable = IsAllIngredientsPlaced && currentExtractedEnergyCount >= CurrentRecipe.RequiredEnergyCount;
-                }                
-            }          
+                craftSection.ItemCreationSection.CraftDescriptionPanel.SetExtractedEnergyCountInfo(CurrentExtractedEnergyCount.Value, currentRecipe.RequiredEnergyCount);
+                IsCreationAvailable = IsAllIngredientsPlaced && currentExtractedEnergyCount >= CurrentRecipe.RequiredEnergyCount;
+            }
         }
     }
 
@@ -89,7 +88,9 @@ public class CraftManager : MonoBehaviour
     {
         inventoryManager.AddNewItemState(currentRecipeVariant.ResultItem.GetResultItemState());
         UpdateIngredientsStates();
+        UpdateEnergyContainingItemsStates();
         craftSection.InventorySection.UpdateInventoryContent();
+        gameManager.CountSpecialItems();
     }
 
     public void UpdateRequiredItemsProgress(List<CraftingItemTemplateCellView> itemCells)
@@ -118,7 +119,7 @@ public class CraftManager : MonoBehaviour
 
     public void GetEnergyCellsData()
     {
-        var itemStates = craftSection.ItemCreationSection.EnergyCellsItems.Select(cell => cell.ItemState).ToList();  
+        var itemStates = EnergyContainingItems.Select(cell => cell.ItemState).ToList();  
         CurrentExtractedEnergyCount = itemStates
             .Select(item => item switch
             {
@@ -173,6 +174,43 @@ public class CraftManager : MonoBehaviour
         UpdateRequiredItemsProgress(currentCraftingTemplateCells);
     }
 
+    private void UpdateEnergyContainingItemsStates()
+    {
+        var requiredEnergyCount = currentRecipe.RequiredEnergyCount;
+        foreach (var item in EnergyContainingItems)
+        {
+            switch (item.ItemState)
+            {
+                case StackableItemState:
+                    if ((item.ItemState as StackableItemState).TotalContainedEnergyCount <= requiredEnergyCount)
+                    {
+                        requiredEnergyCount -= (item.ItemState as StackableItemState).TotalContainedEnergyCount;
+                        RemoveCraftUsedItem(item);
+                    }
+                    else
+                    {
+                        (item.ItemState as StackableItemState).ItemsCount -= (int)Mathf.Ceil((float)requiredEnergyCount / (item.ItemState as StackableItemState).ContainedEnergyCount);
+                        if ((item.ItemState as StackableItemState).ItemsCount == 0)
+                        {
+                            RemoveCraftUsedItem(item);
+                        }
+                        requiredEnergyCount = 0;                        
+                    }
+                    break;
+
+                case SingleItemState:
+                    requiredEnergyCount -= item.ItemState.ContainedEnergyCount;
+                    RemoveCraftUsedItem(item);
+                    break;
+            }
+            if (requiredEnergyCount <= 0)
+            {
+                break;
+            }
+        }
+        GetEnergyCellsData();
+    }
+
     private void RemoveCraftUsedItem(ItemInfo itemCell)
     {
         inventoryManager.RemoveItemState(itemCell.ItemState);
@@ -182,6 +220,7 @@ public class CraftManager : MonoBehaviour
 
     private void Start()
     {
+        gameManager = FindObjectOfType<GameManager>();
         inventoryManager = GetComponent<InventoryManager>();
         craftSection = FindObjectOfType<CraftSection>();
     }

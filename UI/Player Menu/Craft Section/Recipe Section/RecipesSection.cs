@@ -14,11 +14,11 @@ public class RecipesSection : MonoBehaviour
 
     public void CreateRecipeCategories(List<RecipeData> recipes)
     {
-        var recipesDictionary = recipes.GroupBy(recipe => recipe.Category).ToDictionary(group => group.Key, group => group.ToList());
+        var recipesDictionary = recipes.GroupBy(recipe => recipe.LocalizedCategoryTitle).ToDictionary(group => group.Key, group => group.ToList());
         foreach (var recipesGroup in recipesDictionary)
         {
             var newCategoryView = Instantiate(recipesCategoryViewPrefab, recipesCategoriesContainer.transform);
-            newCategoryView.SetInfo(recipesGroup.Key.ToString(), recipesGroup.Value);
+            newCategoryView.SetInfo(recipesGroup.Key, recipesGroup.Value);
         }
     }
 

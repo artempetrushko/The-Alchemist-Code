@@ -61,7 +61,7 @@ public class ItemCreationSectionPointer : MonoBehaviour, IPointerDownHandler, IP
         {
             itemCreationSection.CraftProgressRound.fillAmount += 1f / progressBarFillingTimeInSecond * stepTimeInSecond;
             remainingTimeToFillProgressBar -= stepTimeInSecond;
-            yield return new WaitForSeconds(stepTimeInSecond);
+            yield return new WaitForSecondsRealtime(stepTimeInSecond);
         }
         if (isCreationProceed)
         {

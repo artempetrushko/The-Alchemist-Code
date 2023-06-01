@@ -8,42 +8,44 @@ using UnityEngine.UI;
 public class SettingPanel : MonoBehaviour
 {
     [SerializeField]
-    protected TMP_Text settingValueText;
+    private TMP_Text settingTitleText;
     [SerializeField]
-    protected Button leftChooseSettingValueButton;
+    private TMP_Text settingValueText;
     [SerializeField]
-    protected Button rightChooseSettingValueButton;
+    private Button leftChooseSettingValueButton;
+    [SerializeField]
+    private Button rightChooseSettingValueButton;
+    [SerializeField]
+    private Image background;
 
-    protected List<string> settingValues;
-    protected Action<string> applySettingAction;
-    protected int currentSettingValueIndex;
+    private SettingData settingData;
 
-    public int CurrentSettingValueIndex
+    private int CurrentSettingValueIndex
     {
-        get => currentSettingValueIndex;
-        private set
+        get => settingData.CurrentSettingValueIndex;
+        set
         {
-            if (value >= 0 && value < settingValues.Count)
+            if (value >= 0 && value < settingData.SettingValuesCount)
             {
-                currentSettingValueIndex = value;
-                settingValueText.text = settingValues[currentSettingValueIndex];
+                settingValueText.text = settingData.ChangeSettingValue(value);
                 ToggleChooseSettingValueButtonState(leftChooseSettingValueButton, value > 0);
-                ToggleChooseSettingValueButtonState(rightChooseSettingValueButton, value < settingValues.Count - 1);
+                ToggleChooseSettingValueButtonState(rightChooseSettingValueButton, value < settingData.SettingValuesCount - 1);
             }
         }
     }
 
-    public void ShiftNeighboringSettingValue(int offset) => CurrentSettingValueIndex += offset;
+    public void ToggleBackgroundState(bool isEnable) => background.gameObject.SetActive(isEnable);
 
-    public void ApplySettingValue() => applySettingAction.Invoke(settingValues[CurrentSettingValueIndex]);
+    public void ShiftNeighboringSettingValue(int offset) => CurrentSettingValueIndex += offset;
 
     public void SetData(SettingData settingData)
     {
-        settingValues = settingData.SettingValues;
-        applySettingAction = settingData.ApplySettingAction;
-    }  
+        this.settingData = settingData;
+        settingTitleText.text = settingData.Title;
+        CurrentSettingValueIndex = settingData.CurrentSettingValueIndex;
+    }
 
-    protected void ToggleChooseSettingValueButtonState(Button button, bool isEnable)
+    private void ToggleChooseSettingValueButtonState(Button button, bool isEnable)
     {
         button.enabled = isEnable;
         button.GetComponent<Image>().enabled = isEnable;

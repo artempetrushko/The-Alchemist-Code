@@ -19,12 +19,12 @@ public class InventoryView : PlayerMenuSection
 
     public GameObject InventoryCells => inventoryCells.gameObject;
     public GameObject PlayerSetItemCells => playerSetItemCells;
-    public GameObject QuickAccessToolbar => quickAccessToolbar.gameObject;
+    public QuickAccessToolbar QuickAccessToolbar => quickAccessToolbar;
     public List<PlayerSetItemCellContainer> PlayerSetItemCellContainers => playerSetItemCells.GetComponentsInChildren<PlayerSetItemCellContainer>().ToList();
 
     public override void SetVisibility(bool isVisible)
     {
-        gameObject.transform.localScale = isVisible? Vector3.one : Vector3.zero;
+        gameObject.transform.localScale = isVisible ? Vector3.one : Vector3.zero;
         if (isVisible)
         {
             inventoryCells.StartNavigation();
@@ -35,7 +35,7 @@ public class InventoryView : PlayerMenuSection
             inventorySectionNavigation.CurrentSubsection.StopNavigation();
         }
     }
-
+    
     public void RefreshInventoryContent(ItemState itemState)
     {
         if (itemState.CurrentInventoryItemCellView != null)
@@ -54,6 +54,7 @@ public class InventoryView : PlayerMenuSection
         if (attachedItemState.CurrentInventoryItemCellView != null)
         {
             Destroy(attachedItemState.CurrentInventoryItemCellView.GetComponent<ItemCellContainer>().ContainedItem.gameObject);
+            attachedItemState.CurrentInventoryItemCellView.GetComponent<ItemCellContainer>().ItemPlace.transform.DetachChildren();
         }
     }
 
@@ -137,5 +138,6 @@ public class InventoryView : PlayerMenuSection
     private void Start()
     {
         inventorySectionNavigation = GetComponent<InventorySectionNavigation>();
+        SetVisibility(false);
     }
 }

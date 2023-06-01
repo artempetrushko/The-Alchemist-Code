@@ -8,9 +8,12 @@ public class ItemsContainer : InteractiveObject
 {
     [SerializeField]
     private ItemsSpawnChancesTable spawnChancesTable;
+    [SerializeField]
+    private GameObject filledContainerEffect;
 
     private List<ItemState> spawnedItems = new List<ItemState>();
     private InventoryManager inventoryManager;
+    private ItemPickingMessagesSection itemPickingMessagesSection;
     private bool isItemsSpawned = false;
 
     public void OpenContainer()
@@ -28,6 +31,10 @@ public class ItemsContainer : InteractiveObject
         if (isItemsSpawned && spawnedItems.Count == 0)
         {
             interactiveObjectPanel.DisableContainerContentView(true);
+            if (filledContainerEffect != null)
+            {
+                Destroy(filledContainerEffect);
+            }
             Destroy(this);
             return;
         }
@@ -39,7 +46,8 @@ public class ItemsContainer : InteractiveObject
         var pickingItem = spawnedItems[itemNumber];
         if (inventoryManager.AddNewItemState(pickingItem))
         {
-            spawnedItems.RemoveAt(itemNumber);          
+            spawnedItems.RemoveAt(itemNumber);       
+            itemPickingMessagesSection.UpdateContent(pickingItem);
         }
         interactiveObjectPanel.UpdateContainerContentView(spawnedItems, PickItem);
     }
@@ -56,8 +64,14 @@ public class ItemsContainer : InteractiveObject
         }
     }
 
-    private void OnEnable()
+    protected override void OnEnable()
     {
+        base.OnEnable();
         inventoryManager = FindObjectOfType<InventoryManager>();
+        itemPickingMessagesSection = FindObjectOfType<ItemPickingMessagesSection>();
+        if (filledContainerEffect != null && !filledContainerEffect.activeInHierarchy)
+        {
+            filledContainerEffect.SetActive(true);
+        }
     }
 }

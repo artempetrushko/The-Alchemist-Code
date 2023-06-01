@@ -14,6 +14,8 @@ public class EnergyCellView : CraftItemCellView, IPointerEnterHandler, IPointerE
     private GameObject itemsCounterContainer;
     [SerializeField]
     private Button clearCellButton;
+    [SerializeField]
+    private Image energyBackgroundIcon;
     [Space]
     [SerializeField]
     private EnergyCellView leftNeighboringCell;
@@ -40,14 +42,17 @@ public class EnergyCellView : CraftItemCellView, IPointerEnterHandler, IPointerE
         {
             SetItemsCount((inventoryItem as StackableItemState).ItemsCount);
         }
+        energyBackgroundIcon.gameObject.SetActive(false);
         SetEnergyCount(inventoryItem);
         craftManager.GetEnergyCellsData();
     }
 
     public override void DisableInfoElements()
     {
+        energyBackgroundIcon.gameObject.SetActive(true);
         itemsCounterContainer.SetActive(false);
         energyCounterContainer.SetActive(false);
+        craftManager.GetEnergyCellsData();
     }
 
     public void OnPointerClick(PointerEventData eventData)

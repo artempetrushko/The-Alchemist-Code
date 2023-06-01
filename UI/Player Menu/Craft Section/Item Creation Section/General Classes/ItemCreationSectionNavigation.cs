@@ -15,6 +15,7 @@ public class ItemCreationSectionNavigation : MonoBehaviour
     [SerializeField]
     private CraftInventoryCategoriesNavigation craftInventoryCategoriesNavigation;
 
+    private CraftSectionInventory craftSectionInventory;
     private CraftSectionNavigation sectionNavigation;
     private ItemCellView selectedCell;
 
@@ -168,15 +169,18 @@ public class ItemCreationSectionNavigation : MonoBehaviour
         {
             destinationItemContainer.PlaceItem(returningItem);
         }
-        /*else
+        else
         {
-            var freeCell = inventorySubsection.GetComponentsInChildren<ItemCellContainer>().Where(cell => cell.IsItemPlaceEmpty).First();
+            var freeCell = craftSectionInventory.GetComponentInChildren<CraftInventoryQuickAccessSubsection>().GetComponentsInChildren<ItemCellContainer>().Where(cell => cell.IsItemPlaceEmpty)
+                .Concat(craftSectionInventory.GetComponentInChildren<CraftInventoryMainSubsection>().GetComponentsInChildren<ItemCellContainer>().Where(cell => cell.IsItemPlaceEmpty))
+                .First();
             freeCell.PlaceItem(startCell.GetComponent<ItemCellContainer>().ContainedItem);
-        }*/
+        }
     }
 
     private void OnEnable()
     {
+        craftSectionInventory = FindObjectOfType<CraftSectionInventory>();
         sectionNavigation = GetComponentInParent<CraftSectionNavigation>();
     }
 }

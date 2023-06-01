@@ -119,6 +119,7 @@ public class InventoryCellInteractions : MonoBehaviour
     {
         var selectedItem = CurrentInteractingItemState as StackableItemState;
         selectedItem.ItemsCount -= SelectedItemsCount;
+        FindObjectOfType<GameManager>().CountSpecialItems();
 
         var droppedItemState = selectedItem.Clone() as StackableItemState;
         droppedItemState.ItemsCount = SelectedItemsCount;
@@ -128,7 +129,6 @@ public class InventoryCellInteractions : MonoBehaviour
 
     private void DropAllItems()
     {       
-        inventoryManager.DropItemState(CurrentInteractingItemState);
         if (chooseItemsCountPanel.isActiveAndEnabled)
         {
             CloseChooseItemsCountPanel();
@@ -137,6 +137,7 @@ public class InventoryCellInteractions : MonoBehaviour
         {
             onItemCellInteractionExecuted?.Invoke();
         }
+        inventoryManager.DropItemState(CurrentInteractingItemState);
     }
 
     private void HideItemCellActionsMenu() => FindObjectOfType<ItemCellActionMenu>().transform.localScale = Vector3.zero;

@@ -10,12 +10,7 @@ public abstract class InteractiveObject : MonoBehaviour
 
     public string Title => title;
 
-    private void OnEnable()
-    {
-        interactiveObjectPanel = FindObjectOfType<InteractiveObjectPanel>();
-    }
-
-    private void Start()
+    protected virtual void OnEnable()
     {
         interactiveObjectPanel = FindObjectOfType<InteractiveObjectPanel>();
     }

@@ -15,9 +15,10 @@ public class InventoryManager : MonoBehaviour
     private UnityEvent<ItemState> itemStateRemoved;
 
     private List<ItemState> items = new List<ItemState>();
-    private PlayerSetItems playerSetItems = new PlayerSetItems();
+    private PlayerSetItems playerSetItems;
     private InventoryView inventoryView;
     private PlayerInput player;
+    private GameManager gameManager;
     
     public List<ItemState> Items => items;
     public PlayerSetItems PlayerSetItems => playerSetItems;
@@ -39,6 +40,9 @@ public class InventoryManager : MonoBehaviour
 
                     case MaterialState:
                         return AddStackableItemState(itemState as MaterialState);
+
+                    case PotionState:
+                        return AddStackableItemState(itemState as PotionState);
                 }
                 break;
         }     
@@ -71,6 +75,7 @@ public class InventoryManager : MonoBehaviour
     {       
         itemStateRemoved.Invoke(itemState);
         items.Remove(itemState);
+        UpdatePlayerSetItems();
         Debug.Log(items.Count);
     }
 
@@ -124,6 +129,7 @@ public class InventoryManager : MonoBehaviour
                     break;
             }
         }
+        inventoryView.QuickAccessToolbar.UpdateSelectedQuickAccessItem();
         #region Debug Zone
         /*Debug.Log(PlayerSetItems.LeftHandWeapon);
         Debug.Log(PlayerSetItems.RightHandWeapon);
@@ -196,8 +202,18 @@ public class InventoryManager : MonoBehaviour
 
     private void Start()
     {
-        player = FindObjectOfType<PlayerInput>();
+        gameManager = FindObjectOfType<GameManager>();
+        player = FindObjectOfType<PlayerInput>();        
         inventoryView = FindObjectOfType<InventoryView>();
         inventoryView.FillWithEmptyCells(InventorySize);
+        foreach (var item in gameManager.CreateStartSpecialItems())
+        {
+            AddNewItemState(item);
+        }
+    }
+
+    private void OnEnable()
+    {
+        playerSetItems = GetComponent<PlayerSetItems>();
     }
 }

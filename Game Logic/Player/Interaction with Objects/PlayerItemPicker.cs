@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PlayerItemPicker : ItemPicker
 {
     [SerializeField]
     private InventoryManager inventoryManager;
+    [SerializeField]
+    private UnityEvent<ItemState> onItemPicked;
 
     public override void PickItems()
     {
@@ -15,6 +18,7 @@ public class PlayerItemPicker : ItemPicker
             {
                 if (inventoryManager.AddNewItemState(item.CurrentItemState))
                 {
+                    onItemPicked.Invoke(item.CurrentItemState);
                     Destroy(item.gameObject);
                 }
             }

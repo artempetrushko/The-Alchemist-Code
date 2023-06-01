@@ -6,8 +6,11 @@ using UnityEngine;
 public enum RecipeCategory
 {
     Weapon,
+    Missiles,
     Clothes,
-    Potion,
+    Potions,
+    Resources,
+    Special,
     Others
 }
 
@@ -37,6 +40,16 @@ public class RecipeData : ScriptableObject
 
     public Sprite RecipeIcon => recipeIcon;
     public RecipeCategory Category => category;
+    public string LocalizedCategoryTitle => Category switch
+    {
+        RecipeCategory.Weapon => "Оружие",
+        RecipeCategory.Missiles => "Снаряды",
+        RecipeCategory.Clothes => "Одежда",
+        RecipeCategory.Potions => "Зелья",
+        RecipeCategory.Resources => "Ресурсы",
+        RecipeCategory.Special => "Особое",
+        RecipeCategory.Others => "Другое"
+    };
     public string Title => title;
     public string Description => description;
     public int RequiredEnergyCount => requiredEnergyCount;

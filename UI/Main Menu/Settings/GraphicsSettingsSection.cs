@@ -6,114 +6,43 @@ using UnityEngine;
 
 public class GraphicsSettingsSection : MonoBehaviour
 {
-    private void SendSettingsData()
+    [SerializeField]
+    private SettingPanel settingPanelPrefab;
+
+    private List<SettingData> settingDatas;
+
+    public void SendSettingsData()
     {
-        var settingsData = new List<SettingData>()
+        settingDatas = new List<SettingData>()
         {
-            GetResolutionSettingData(),
-            GetScreenModeSettingData(),
-            GetGraphicsQualitySettingData(),
-            GetVSyncSettingData(),
-            GetBrightnessSettingData()
+            new ScreenResolutionSettingData(SettingsManager.GraphicsSettings.ScreenResolutionWidth, SettingsManager.GraphicsSettings.ScreenResolutionHeight),
+            new ScreenModeSettingData(SettingsManager.GraphicsSettings.ScreenMode),
+            new GraphicsQualitySettingData(SettingsManager.GraphicsSettings.QualityLevel),
+            new VSyncSettingData(SettingsManager.GraphicsSettings.VSyncState),
+            new BrightnessSettingData(SettingsManager.GraphicsSettings.Brightness),
         };
-        var settingPanels = GetComponentsInChildren<SettingPanel>();
-        for (var i = 0; i < settingPanels.Length; i++)
+        for (var i = transform.childCount - 1; i >= 0; i--)
         {
-            settingPanels[i].SetData(settingsData[i]);
+            Destroy(transform.GetChild(i).gameObject);
+        }
+        transform.DetachChildren();
+        for (var i = 0; i < settingDatas.Count; i++)
+        {
+            var settingPanel = Instantiate(settingPanelPrefab, transform);
+            settingPanel.SetData(settingDatas[i]);
         }
     }
 
-    private void SetStartGraphicsSettingsValues()
+    public void ApplySettings()
     {
-        
-    }
-
-    private SettingData GetResolutionSettingData()
-    {
-        return new SettingData(Screen.resolutions.Select(resolution => resolution.width + " x " + resolution.height).ToList(), new Action<string>(
-                (resolution) =>
-                {
-                    var resolutionData = resolution.Split(" x ");
-                    Screen.SetResolution(int.Parse(resolutionData[0]), int.Parse(resolutionData[1]), true);
-                    SaveManager.GraphicsSettings.ScreenResolution = Screen.currentResolution;
-                }));
-    }
-
-    private SettingData GetScreenModeSettingData()
-    {
-        return new SettingData(new List<string>()
+        foreach (var settingData in settingDatas)
         {
-            "Полноэкранный",
-            "Оконный (без рамки)",            
-            "Оконный"
-        }, new Action<string>(
-            (screenMode) =>
-            {
-                Screen.fullScreenMode = screenMode switch
-                {
-                    "Полноэкранный" => FullScreenMode.ExclusiveFullScreen,
-                    "Оконный (без рамки)" => FullScreenMode.FullScreenWindow,                   
-                    "Оконный" => FullScreenMode.Windowed
-                };
-                SaveManager.GraphicsSettings.ScreenMode = Screen.fullScreenMode;
-            }));
-    }
-
-    private SettingData GetGraphicsQualitySettingData()
-    {
-        return new SettingData(new List<string>()
-        {
-            "Низкое",
-            "Среднее",
-            "Высокое"
-        }, new Action<string>(
-            (graphicsQuality) =>
-            {
-                QualitySettings.SetQualityLevel(graphicsQuality switch
-                {
-                    "Низкое" => 0,
-                    "Среднее" => 1,
-                    "Высокое" => 2
-                });
-                SaveManager.GraphicsSettings.QualityLevel = QualitySettings.GetQualityLevel();
-            }));
-    }
-
-    private SettingData GetVSyncSettingData()
-    {
-        return new SettingData(new List<string>()
-        {
-            "Выкл.",
-            "Вкл.",
-        }, new Action<string>(
-            (vsyncState) =>
-            {
-                QualitySettings.vSyncCount = vsyncState switch
-                {
-                    "Выкл." => 0,
-                    "Вкл." => 1,
-                };
-                SaveManager.GraphicsSettings.VSyncState = QualitySettings.vSyncCount;
-            }));
-    }
-
-    private SettingData GetBrightnessSettingData()
-    {
-        var brightnessLevelsCount = 10;
-        var brightnessSettingValues = new List<string>();
-        for (var i = 1; i <= brightnessLevelsCount; i++)
-        {
-            brightnessSettingValues.Add(i.ToString());
+            settingData.ApplySettingValue();
         }
-        return new SettingData(brightnessSettingValues, new Action<string>(
-            (brightness) =>
-            {
-                Screen.brightness = 1 / brightnessLevelsCount * int.Parse(brightness);
-                SaveManager.GraphicsSettings.Brightness = Screen.brightness;
-            }));
+        SettingsManager.SaveSettings();
     }
 
-    private void Start()
+    private void OnEnable()
     {
         SendSettingsData();
     }

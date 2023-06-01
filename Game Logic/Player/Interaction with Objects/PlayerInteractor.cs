@@ -21,6 +21,14 @@ public class PlayerInteractor : MonoBehaviour
                     player.SwitchActionMap_UI_ItemsContainer();
                     UpdateActionTips_UI_ItemsContainer(player.GetActionTips_UI_ItemsContainer());
                     break;
+
+                case Workbench:
+                    (currentInteractiveObject as Workbench).ShowCraftMenu();
+                    break;
+
+                case DungeonPortal:
+                    (currentInteractiveObject as DungeonPortal).Interact();
+                    break;
             }
         }        
     }
@@ -31,7 +39,7 @@ public class PlayerInteractor : MonoBehaviour
     {
         if (currentInteractiveObject != null)
         {
-            interactiveObjectPanel.SetInfoAndEnable(currentInteractiveObject.Title, currentInteractiveObject.transform, GetPossiblePlayerActions());
+            interactiveObjectPanel.SetInfoAndEnable(currentInteractiveObject.Title, currentInteractiveObject.transform, player.GetActionTips_InteractiveObject(currentInteractiveObject));
         }       
     }
 
@@ -69,24 +77,13 @@ public class PlayerInteractor : MonoBehaviour
     }
     #endregion
 
-    private List<DetailedActionTip> GetPossiblePlayerActions()
-    {
-        switch (currentInteractiveObject)
-        {
-            case ItemsContainer:
-                return player.GetActionTips_InteractiveObject_ItemContainer();
-            default:
-                return null;
-        }
-    }
-
     private void OnTriggerStay(Collider other)
     {
         var potentialInteractiveObject = other.GetComponent<InteractiveObject>();
         if (potentialInteractiveObject != null && currentInteractiveObject == null)
         {
             currentInteractiveObject = potentialInteractiveObject;
-            interactiveObjectPanel.SetInfoAndEnable(currentInteractiveObject.Title, currentInteractiveObject.transform, GetPossiblePlayerActions());
+            interactiveObjectPanel.SetInfoAndEnable(currentInteractiveObject.Title, currentInteractiveObject.transform, player.GetActionTips_InteractiveObject(currentInteractiveObject));
         }
     }
 

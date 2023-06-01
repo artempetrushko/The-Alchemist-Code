@@ -25,7 +25,7 @@ public class ItemDescriptionPanel : MonoBehaviour
         if (containedItem != null)
         {
             SetInfo(containedItem.ItemState);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSecondsRealtime(1f);
             if (isPanelExists)
             {
                 transform.position = SetPosition(attachedCell);
